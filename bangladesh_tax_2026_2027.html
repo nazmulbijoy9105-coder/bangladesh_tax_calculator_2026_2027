@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বাংলাদেশ আয়কর ক্যালকুলেটর ২০২৬-২০২৭</title>
+    <style>
+        :root { --green:#006a4e; --red:#f42a41; --bg:#f4f7f6; --card:#fff; --text:#1a1a1a; --border:#d0d7de; --gold:#ff9800; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:"Segoe UI","Noto Sans Bengali",Arial,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; padding:10px; }
+        .container { max-width:860px; margin:0 auto; }
+        header { background:linear-gradient(135deg,var(--green) 0%,#004d38 100%); color:#fff; padding:24px 16px; border-radius:12px; text-align:center; margin-bottom:18px; box-shadow:0 4px 12px rgba(0,0,0,.15); }
+        header h1 { font-size:1.35rem; margin-bottom:6px; }
+        header p { font-size:.88rem; opacity:.95; }
+        .card { background:var(--card); border-radius:10px; padding:18px; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,.06); border:1px solid var(--border); }
+        .card h2 { font-size:1.05rem; color:var(--green); margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid var(--red); }
+        .form-group { margin-bottom:12px; }
+        label { display:block; font-weight:600; margin-bottom:5px; font-size:.93rem; }
+        .hint { font-size:.78rem; color:#555; font-weight:400; }
+        input[type="number"], select { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:6px; font-size:1rem; font-family:inherit; }
+        input:focus, select:focus { outline:none; border-color:var(--green); }
+        .checkbox-group { display:flex; align-items:flex-start; gap:10px; margin:10px 0; font-size:.93rem; }
+        .checkbox-group input { width:18px; height:18px; margin-top:3px; accent-color:var(--green); }
+        .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        @media (max-width:600px){ .row{grid-template-columns:1fr;} header h1{font-size:1.1rem;} }
+        button.calculate { width:100%; padding:14px; background:var(--red); color:#fff; border:none; border-radius:8px; font-size:1.1rem; font-weight:700; cursor:pointer; margin-top:8px; }
+        button.calculate:hover { background:#d11f33; }
+        .result-box { background:#e8f5e9; border-left:5px solid var(--green); padding:14px; border-radius:8px; margin-top:10px; }
+        .result-line { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px dashed #c8e6c9; font-size:.95rem; }
+        .result-line:last-child { border-bottom:none; }
+        .result-line.total { font-weight:700; color:var(--green); font-size:1.08rem; margin-top:6px; padding-top:8px; border-top:2px solid var(--green); border-bottom:none; }
+        .result-line.negative { color:var(--red); }
+        .slab-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:.9rem; }
+        .slab-table th, .slab-table td { border:1px solid var(--border); padding:7px; text-align:left; }
+        .slab-table th { background:var(--green); color:#fff; }
+        .slab-table td:nth-child(3), .slab-table td:nth-child(4) { text-align:right; }
+        .note { font-size:.84rem; color:#444; margin-top:12px; padding:10px; background:#fffde7; border-radius:6px; border-left:4px solid var(--gold); }
+        .note.red { background:#ffebee; border-left-color:var(--red); }
+        .hidden { display:none; }
+        .minitbl { width:100%; border-collapse:collapse; font-size:.8rem; margin:6px 0; }
+        .minitbl th, .minitbl td { border:1px solid var(--border); padding:4px 6px; }
+        .minitbl th { background:#e8f5e9; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>আয়কর ক্যালকুলেটর ২০২৬-২০২৭</h1>
+        <p>ব্যক্তিগত করদাতা | আয়কর নির্দেশিকা ২০২৬-২০২৭, আয়কর আইন ২০২৩ ও অর্থ আইন ২০২৬ অনুযায়ী</p>
+    </header>
+
+    <!-- ১. করদাতার তথ্য -->
+    <div class="card">
+        <h2>১. করদাতার তথ্য</h2>
+        <div class="row">
+            <div class="form-group">
+                <label>করদাতার শ্রেণী</label>
+                <select id="category">
+                    <option value="male">পুরুষ — করমুক্ত: ৳৪,০০,০০০</option>
+                    <option value="female">নারী — করমুক্ত: ৳৪,৫০,০০০</option>
+                    <option value="senior">৬৫+ বয়স্ক — করমুক্ত: ৳৪,৫০,০০০</option>
+                    <option value="disabled">প্রতিবন্ধী — করমুক্ত: ৳৫,২৫,০০০</option>
+                    <option value="third_gender">তৃতীয় লিঙ্গ — করমুক্ত: ৳৫,২৫,০০০</option>
+                    <option value="freedom_fighter">গেজেটভুক্ত যুদ্ধাহত মুক্তিযোদ্ধা — করমুক্ত: ৳৫,৫০,০০০</option>
+                    <option value="non_resident">অনিবাসী (Non-resident) — করমুক্ত সীমা নেই</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>রিটার্ন দাখিলের সময়কাল <span class="hint">(ধারা ১৭৩ — শাস্তি হিসাবের জন্য)</span></label>
+                <select id="filingPeriod">
+                    <option value="q1">১ জুলাই – ৩০ সেপ্টেম্বর (৫% বা ৳২৫,০০০ — কমটি)</option>
+                    <option value="q2" selected>১ অক্টোবর – ৩১ ডিসেম্বর (শাস্তি নেই)</option>
+                    <option value="q3">১ জানুয়ারি – ৩১ মার্চ (২% বা সর্বনিম্ন ৳৩,০০০)</option>
+                    <option value="q4">১ এপ্রিল – ৩০ জুন (৫% বা সর্বনিম্ন ৳৫,০০০)</option>
+                    <option value="late">৩০ জুনের পরে বিলম্বিত দাখিল (১০% বা ৳৫,০০০)</option>
+                </select>
+            </div>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="parentDisabled">
+            <label for="parentDisabled" style="margin:0;font-weight:500;">
+                প্রতিবন্ধী ব্যক্তির পিতা/মাতা বা আইনানুগ অভিভাবক
+                <span class="hint">(প্রতি প্রতিবন্ধী সন্তান/আশ্রিতের জন্য +৳৫০,০০০; উভয় পিতামাতা করদাতা হলে একজনই ভোগ করবেন)</span>
+            </label>
+        </div>
+        <div class="form-group hidden" id="disabledCountWrap">
+            <label>প্রতিবন্ধী সন্তান/আশ্রিত সংখ্যা</label>
+            <input type="number" id="disabledCount" value="1" min="1" style="max-width:140px;">
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="newTaxpayer">
+            <label for="newTaxpayer" style="margin:0;font-weight:500;">
+                নতুন করদাতা <span class="hint">(সর্বনিম্ন কর ৳১,০০০ প্রযোজ্য হবে — উদাহরণ-২২)</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- ২. আয়ের উৎস -->
+    <div class="card">
+        <h2>২. আয়ের উৎস (৳)</h2>
+        <div class="row">
+            <div class="form-group">
+                <label>বেতনজাত আয় (গ্রস) <span class="hint">Salary — ১/৩ বা ৳৫,০০,০০০ (যেটি কম) স্বয়ংক্রিয়ভাবে করমুক্ত (৬ষ্ঠ তফসিল দফা-২৭)</span></label>
+                <input type="number" id="salary" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>ভাড়াজাত আয় <span class="hint">House Property (অনুমোদিত বিয়োজনের পরে করযোগ্য অংক)</span></label>
+                <input type="number" id="house" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>কৃষিজাত আয় <span class="hint">Agriculture (গ্রস; উৎপাদিত ও বিক্রীত হলে ৬০% কৃষি + ৪০% ব্যবসা হারে)</span></label>
+                <input type="number" id="agri" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>ব্যবসায়জাত আয় <span class="hint">Business/Profession (করযোগ্য নিট আয়)</span></label>
+                <input type="number" id="business" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>অন্যান্য মূলধনী আয় <span class="hint">(স্ল্যাব হারে — অলংকার ৫% পৃথক নোট দেখুন)</span></label>
+                <input type="number" id="capital" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>জমি/ভবন/ফ্ল্যাটের মূলধনী লাভ <span class="hint">নিচের চেকবক্স অনুযায়ী ১৫% পৃথক বা স্ল্যাবে</span></label>
+                <input type="number" id="capitalLand" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>তালিকাভুক্ত শেয়ার/ইউনিটের মূলধনী লাভ <span class="hint">প্রথম ৳৫০ লাখ করমুক্ত; অবশিষ্ট ১৫% পৃথক</span></label>
+                <input type="number" id="capitalShares" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>আর্থিক সম্পদজাত আয় (সুদ) <span class="hint">ব্যাংক/সঞ্চয়পত্রের সুদ ইত্যাদি — স্ল্যাবে ও রিবেটভিত্তিতে</span></label>
+                <input type="number" id="financial" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>লভ্যাংশ (Dividend) <span class="hint">১৫% পৃথক হারে চূড়ান্ত কর — স্ল্যাব ও রিবেটভিত্তির বাইরে</span></label>
+                <input type="number" id="dividend" value="0" min="0">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>অন্যান্য উৎস <span class="hint">Royalty, ফি, সরকারি ভর্তুকি ইত্যাদি (লটারি ৩০% — নোট দেখুন)</span></label>
+                <input type="number" id="other" value="0" min="0">
+            </div>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="agriOnly">
+            <label for="agriOnly" style="margin:0;font-weight:500;">
+                কৃষি ও আর্থিক সম্পদের আয়ই একমাত্র আয়
+                <span class="hint">(৬ষ্ঠ তফসিল দফা-২০: ৳৫,০০,০০০ পর্যন্ত কৃষি আয় করমুক্ত — অন্য কোনো খাতে আয় থাকলে প্রযোজ্য নয়)</span>
+            </label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="landLong">
+            <label for="landLong" style="margin:0;font-weight:500;">
+                জমি/ভবন/ফ্ল্যাট ৫ বছরের অধিক ধারণের পরে হস্তান্তর
+                <span class="hint">(১৫% পৃথক হারে; ৫ বছরের মধ্যে হলে স্ল্যাব হারে ধরা হবে)</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- ৩. বিনিয়োগ -->
+    <div class="card">
+        <h2>৩. রিবেটযোগ্য বিনিয়োগ / ব্যয় (৳) — ধারা ৭৮</h2>
+        <div class="row">
+            <div class="form-group">
+                <label>জীবন বীমা প্রিমিয়াম</label>
+                <input type="number" id="insurance" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>সরকারি/স্বীকৃত ভবিষ্যৎ তহবিল (PF)</label>
+                <input type="number" id="pf" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>ডিপিএস <span class="hint">রিবেটের জন্য সর্বোচ্চ ৳১,২০,০০০</span></label>
+                <input type="number" id="dps" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>সঞ্চয়পত্র / সরকারি সিকিউরিটি <span class="hint">রিবেটের জন্য সর্বোচ্চ ৳৫,০০,০০০</span></label>
+                <input type="number" id="savings" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>তালিকাভুক্ত শেয়ার / মিউচুয়াল ফান্ড / ইউনিট <span class="hint">নতুন বিনিয়োগ (সীমা নেই)</span></label>
+                <input type="number" id="unitFund" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>যাকাত / অনুমোদিত দান <span class="hint">সরকার অনুমোদিত প্রতিষ্ঠানে দান</span></label>
+                <input type="number" id="donation" value="0" min="0">
+            </div>
+        </div>
+    </div>
+
+    <!-- ৪. পূর্ব পরিশোধিত কর ও সম্পদ -->
+    <div class="card">
+        <h2>৪. পূর্ব পরিশোধিত কর, সম্পদ ও সারচার্জ</h2>
+        <div class="row">
+            <div class="form-group">
+                <label>উৎসে কর কাটা (TDS) <span class="hint">সার্টিফিকেট/ব্যাংক সুদ, বেতন ইত্যাদি</span></label>
+                <input type="number" id="tds" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>অগ্রিম কর (গাড়ি/কোয়ার্টারলি) <span class="hint">গাড়ির অগ্রিম কর টেবিল নোট দেখুন</span></label>
+                <input type="number" id="advance" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>নিট পরিসম্পদের মূল্যমান <span class="hint">(৩০ জুনের দাখিলা; সারচার্জের জন্য)</span></label>
+                <input type="number" id="netWealth" value="0" min="0">
+            </div>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="vehHouse">
+            <label for="vehHouse" style="margin:0;font-weight:500;">
+                মোটরগাড়ি (সংজ্ঞানুযায়ী) অথবা নির্ধারিত গৃহসম্পত্র মালিকানা
+                <span class="hint">(নিট সম্পদ ৳৪ কোটির কম হলেও ১০% সারচার্জ টিয়ার প্রযোজ্য — উদাহরণ-৪ ও ৫)</span>
+            </label>
+        </div>
+    </div>
+
+    <button class="calculate" onclick="calculateTax()">কর হিসাব করুন / Calculate Tax</button>
+
+    <!-- ৫. ফলাফল -->
+    <div id="results" class="card hidden">
+        <h2>৫. ফলাফল / Results</h2>
+        <div class="result-box">
+            <div class="result-line"><span>মোট আয় (Gross Total Income)</span><span id="r_totalIncome">৳0</span></div>
+            <div class="result-line"><span>করমুক্ত সীমা (Tax-Free Limit)</span><span id="r_limit">৳0</span></div>
+            <div class="result-line"><span>বিভিন্ন করমুক্তি (বেতন ১/৩ + কৃষি ৳৫ লাখ)</span><span id="r_exempt">৳0</span></div>
+            <div class="result-line"><span>করযোগ্য আয় (স্ল্যাবের জন্য)</span><span id="r_taxable">৳0</span></div>
+
+            <table class="slab-table">
+                <thead><tr><th>আয়ের ধাপ</th><th>হার</th><th>পরিমাণ</th><th>কর</th></tr></thead>
+                <tbody id="slabRows"></tbody>
+                <tfoot><tr><th colspan="3">স্ল্যাব আয়ের উপর মোট কর</th><th id="slabTotal">৳0</th></tr></tfoot>
+            </table>
+
+            <div class="result-line" style="border-top:1px solid #a5d6a7;margin-top:8px;padding-top:8px;">
+                <span>পৃথক হারে কর (জমি/শেয়ার/লভ্যাংশ ১৫%)</span><span id="r_sepTax">৳0</span>
+            </div>
+            <div class="result-line total"><span>কর (রিবেটের আগে)</span><span id="r_taxBefore">৳0</span></div>
+            <div class="result-line"><span>যোগ্য বিনিয়োগ (সীমা প্রয়োগের পরে)</span><span id="r_invest">৳0</span></div>
+            <div class="result-line"><span>রিবেট (সর্বোচ্চ ৳৭,৫০,০০০)</span><span style="color:var(--green)">-<span id="r_rebate">৳0</span></span></div>
+            <div class="result-line"><span>রিবেট-পরবর্তী কর</span><span id="r_taxAfter">৳0</span></div>
+            <div class="result-line hidden" id="minTaxRow"><span>সর্বনিম্ন কর প্রয়োগ</span><span id="r_minTax" style="color:var(--red)">৳0</span></div>
+            <div class="result-line"><span>ধারা ১৭৩ অনুযায়ী প্রদেয় কর</span><span id="r_173">৳0</span></div>
+            <div class="result-line"><span>সারচার্জ (সম্পদের উপর)</span><span id="r_surcharge">৳0</span></div>
+            <div class="result-line hidden" id="penaltyRow"><span>প্ররণাদনা / অতিরিক্ত কর</span><span id="r_penalty" style="color:var(--red)">৳0</span></div>
+            <div class="result-line total"><span>মোট প্রদেয়</span><span id="r_totalPayable">৳0</span></div>
+            <div class="result-line"><span>পূর্ব পরিশোধিত কর (TDS + অগ্রিম)</span><span style="color:var(--red)">-<span id="r_paid">৳0</span></span></div>
+            <div class="result-line total"><span>নেট প্রদেয় কর / Net Tax Payable</span><span id="r_net">৳0</span></div>
+            <div class="result-line total hidden negative" id="refundLine"><span>ফেরতযোগ্য (Refund) — পরবর্তী বছর সমন্বয়/জের টানা যাবে</span><span id="r_refund">৳0</span></div>
+        </div>
+        <div id="minTaxNote" class="note red hidden">করমুক্ত সীমার ঊর্ধ্বে আয় থাকায় সর্বনিম্ন কর প্রযোজ্য: সাধারণ করদাতা ৳৫,০০০; নতুন করদাতা ৳১,০০০ (নির্দেশিকা, পৃষ্ঠা ৫২)।</div>
+        <div id="penaltyNote" class="note hidden"></div>
+    </div>
+
+    <!-- ৬. নোট -->
+    <div class="card">
+        <h2>৬. গুরুত্বপূর্ণ নিয়মাবলী (নির্দেশিকা ২০২৬-২০২৭ অনুযায়ী)</h2>
+        <div class="note">
+            <b>রিবেট (ধারা ৭৮):</b> ৩% × করযোগ্য আয়, বা ১০% × যোগ্য বিনিয়োগ, বা ৳৭,৫০,০০০ — যেটি কম।
+            সীমা: ডিপিএস ৳১,২০,০০০; সঞ্চয়পত্র/সরকারি সিকিউরিটি ৳৫,০০,০০০; তালিকাভুক্ত শেয়ার/ইউনিটে সীমা নেই।
+            রিবেটভিত্তি ('ক') থেকে করমুক্ত, হ্রাসকৃত হার ও চূড়ান্ত-করযোগ্য আয় (লভ্যাংশ, পৃথক ১৫% মূলধনী লাভ) বাদ যায়।
+        </div>
+        <div class="note">
+            <b>মূলধনী আয়:</b> জমি/ভবন/ফ্ল্যাট — ৫ বছরের মধ্যে হস্তান্তরে স্ল্যাব হারে, ৫ বছরের পরে ১৫% পৃথক।
+            তালিকাভুক্ত শেয়ার/ইউনিট — প্রথম ৳৫০ লাখ করমুক্ত, অবশিষ্ট ১৫%। ব্যক্তিগত অলংকারের লাভ ৫%, লটারি ৩০% (পৃথক)।
+        </div>
+        <div class="note">
+            <b>সারচার্জ (সম্পদের উপর, আয়করের হারে):</b>
+            <table class="minitbl">
+                <tr><th>নিট পরিসম্পদ</th><th>হার</th></tr>
+                <tr><td>৳৪ কোটি পর্যন্ত</td><td>শূন্য</td></tr>
+                <tr><td>৳৪–১০ কোটি</td><td>১০%</td></tr>
+                <tr><td>৳১০–২০ কোটি</td><td>২০%</td></tr>
+                <tr><td>৳২০–৫০ কোটি</td><td>৩০%</td></tr>
+                <tr><td>৳৫০ কোটির ঊর্ধ্বে</td><td>৩৫%</td></tr>
+            </table>
+            মোটরগাড়ি (সংজ্ঞানুযায়ী) বা নির্ধারিত গৃহসম্পত্র থাকলে ১০% টিয়ার প্রযোজ্য। তামাকজাত পণ্য প্রস্তুতকারকের আয়ের উপর আলাদা ২.৫% সারচার্জ (এখানে গণনাভুক্ত নয়)।
+        </div>
+        <div class="note">
+            <b>গাড়ির অগ্রিম কর (সারণি-১):</b> ≤১৫০০সিসি ৳২৫,০০০ | ১৫০০–২০০০ ৳৫০,০০০ | ২০০০–২৫০০ ৳৭৫,০০০ |
+            ২৫০০–৩০০০ ৳২,০০,০০০ | ৩০০০–৩৫০০ ৳২,৫০,০০০ | ৩৫০০–৪৫০০ ৳৪,০০,০০০ | ৪৫০০+ ৳৫,০০,০০০ | মাইক্রোবাস/জিপ পিকআপ ৳৪০,০০০।
+            পরিবেশ সারচার্জ: ২৫,০০০ / ৫০,০০০ / ৭৫,০০০ / ১,৫০,০০০ / ২,০০,০০০ / ৩,৫০,০০০ — ০১ জুলাই ২০২৬ হতে ইলেকট্রিক গাড়িতে প্রযোজ্য নয়।
+        </div>
+        <div class="note">
+            <b>দাখিল সময়সীমা:</b> ১ জুলাই–৩০ সেপ্টেম্বর (৫% বা ৳২৫,০০০ — কমটি), ১ অক্টোবর–৩১ ডিসেম্বর (শাস্তি নেই),
+            ১ জানুয়ারি–৩১ মার্চ (২% বা সর্বনিম্ন ৳৩,০০০), ১ এপ্রিল–৩০ জুন (৫% বা সর্বনিম্ন ৳৫,০০০);
+            ৩০ জুনের পরে স্বপ্রণোদিত বিলম্ব দাখিলে ১০% বা ৳৫,০০০ (ধারা ১৭৩–১৭৪)।
+        </div>
+        <div class="note">
+            <b>অন্যান্য:</b> ব্যবসায়িক আয়ের উপর কর টার্নওভার করের চেয়ে কম হলে টার্নওভার কর প্রযোজ্য (কমিশন ব্যবসা, পাইকারি ইত্যাদি ব্যতীত)।
+            অনলাইন দাখিল বাধ্যতামূলক: <b>www.etaxnbr.gov.bd</b> (হটলাইন ০৯৬৪৩ ৭১৭১৭১)।
+        </div>
+        <div class="note red">
+            <b>দাবিত্যাগ:</b> এই ক্যালকুলেটর নির্দেশিকার সাধারণ নিয়ম প্রয়োগ করে; ফার্ম আয়ের গড়-হার কর, পার্টনারশিপ ভিত্তি, বিস্তারিত সম্পদ-দায় (IT-10B), ভাড়ার বিয়োজন (২৫%/৩০%) ইত্যাদি জটিল ক্ষেত্রে কর অ্যাডভোকেট/উপ-কর কমিশনারের পরামর্শ নিন।
+        </div>
+    </div>
+</div>
+
+<script>
+// ---------- ধ্রুবক (NBR নির্দেশিকা ২০২৬-২০২৭) ----------
+const SLABS = [
+    { size: 300000,  rate: 0.10, label: 'করমুক্ত সীমার পরবর্তী ৳৩,০০,০০০' },
+    { size: 400000,  rate: 0.15, label: 'পরবর্তী ৳৪,০০,০০০' },
+    { size: 500000,  rate: 0.20, label: 'পরবর্তী ৳৫,০০,০০০' },
+    { size: 2000000, rate: 0.25, label: 'পরবর্তী ৳২০,০০,০০০' },
+    { size: Infinity, rate: 0.30, label: 'অবশিষ্ট আয়' }
+];
+const REBATE_CAP    = 750000;   // ধারা ৭৮: ৳৭.৫০ লক্ষ
+const DPS_CAP       = 120000;   // ৬ষ্ঠ তফসিল অংশ-৩
+const GOVT_SEC_CAP  = 500000;   // সরকারি সিকিউরিটি/সঞ্চয়পত্র
+const SALARY_EX_CAP = 500000;   // বেতন: ১/৩ বা ৳৫ লাখ (দফা-২৭)
+const AGRI_EX_CAP   = 500000;   // কৃষি আয় করমুক্তি (দফা-২০)
+const SHARE_GAIN_EX = 5000000;  // তালিকাভুক্ত শেয়ার লাভ করমুক্তি
+const MIN_TAX       = 5000;
+const MIN_TAX_NEW   = 1000;
+const WEALTH_TIERS  = [
+    { upTo: 40000000,  rate: 0 },
+    { upTo: 100000000, rate: 0.10 },
+    { upTo: 200000000, rate: 0.20 },
+    { upTo: 500000000, rate: 0.30 },
+    { upTo: Infinity,  rate: 0.35 }
+];
+
+const num = id => { const v = parseFloat(document.getElementById(id).value); return (isNaN(v) || v < 0) ? 0 : v; };
+const chk = id => document.getElementById(id).checked;
+const fmt = n => '৳' + Math.round(Math.max(0, n)).toLocaleString('en-IN');
+const set = (id, v) => { document.getElementById(id).textContent = fmt(v); };
+
+function getLimit(cat){
+    switch(cat){
+        case 'female': case 'senior':        return 450000;
+        case 'disabled': case 'third_gender':return 525000;
+        case 'freedom_fighter':              return 550000;
+        case 'non_resident':                 return 0;
+        default:                             return 400000;
+    }
+}
+
+// প্রতিবন্ধী সন্তান সংখ্যা ইনপুট টগল
+document.getElementById('parentDisabled').addEventListener('change', function(){
+    document.getElementById('disabledCountWrap').classList.toggle('hidden', !this.checked);
+});
+
+function calculateTax(){
+    // ---------- ইনপুট ----------
+    const category = document.getElementById('category').value;
+    const salary = num('salary'), house = num('house'), agri = num('agri'),
+          business = num('business'), capitalOther = num('capital'),
+          capitalLand = num('capitalLand'), capitalShares = num('capitalShares'),
+          financial = num('financial'), dividend = num('dividend'), other = num('other');
+    const insurance = num('insurance'), pf = num('pf'), dps = num('dps'),
+          savings = num('savings'), unitFund = num('unitFund'), donation = num('donation');
+    const tds = num('tds'), advance = num('advance'), netWealth = num('netWealth');
+
+    const landLong = chk('landLong');
+    const agriOnly = chk('agriOnly');
+    const newTaxpayer = chk('newTaxpayer');
+    const parentDisabled = chk('parentDisabled');
+    const disabledCount = Math.max(1, num('disabledCount'));
+    const vehHouse = chk('vehHouse');
+    const filingPeriod = document.getElementById('filingPeriod').value;
+
+    // ---------- করমুক্ত সীমা ----------
+    let limit = getLimit(category);
+    if (parentDisabled) limit += 50000 * disabledCount;
+
+    // ---------- বেতন করমুক্তি: ১/৩ বা ৳৫ লাখ (দফা-২৭) ----------
+    const salaryExempt = Math.min(salary / 3, SALARY_EX_CAP);
+    const salaryTaxable = salary - salaryExempt;
+
+    // ---------- কৃষি করমুক্তি ৳৫ লাখ (দফা-২০; শর্ত: অন্য কোনো আয় নেই) ----------
+    let agriExempt = 0;
+    if (agriOnly && salary === 0 && house === 0 && business === 0 &&
+        capitalOther === 0 && capitalLand === 0 && capitalShares === 0 && other === 0) {
+        agriExempt = Math.min(agri, AGRI_EX_CAP);
+    }
+    const agriTaxable = agri - agriExempt;
+
+    // ---------- মূলধনী আয় বিভাজন ----------
+    const landSeparate = landLong ? capitalLand : 0;  // >৫ বছর → ১৫% পৃথক
+    const landSlab     = landLong ? 0 : capitalLand;  // ≤৫ বছর → স্ল্যাব
+    const shareExempt  = Math.min(capitalShares, SHARE_GAIN_EX);
+    const shareTaxable = capitalShares - shareExempt;
+
+    // ---------- স্ল্যাব আয় ও কর ----------
+    const slabIncome = salaryTaxable + house + agriTaxable + business + landSlab + financial + capitalOther + other;
+    const taxable = Math.max(0, slabIncome - limit);
+
+    let remaining = taxable, slabTax = 0;
+    const rows = [];
+    for (const s of SLABS) {
+        const amt = Math.min(remaining, s.size);
+        const tax = amt * s.rate;
+        rows.push({ label: s.label, rate: s.rate, amt, tax });
+        slabTax += tax;
+        remaining -= amt;
+        if (remaining <= 0) break;
+    }
+
+    // ---------- পৃথক হারের কর ----------
+    const sepTax = landSeparate * 0.15 + shareTaxable * 0.15 + dividend * 0.15;
+    const taxBeforeRebate = slabTax + sepTax;
+
+    // ---------- রিবেট (ধারা ৭৮) ----------
+    const dpsE = Math.min(dps, DPS_CAP);
+    const savE = Math.min(savings, GOVT_SEC_CAP);
+    const investEligible = insurance + pf + dpsE + savE + unitFund + donation;
+    let rebate = Math.min(taxable * 0.03, investEligible * 0.10, REBATE_CAP);
+    rebate = Math.max(0, Math.min(rebate, taxBeforeRebate));  // রিবেট করের চেয়ে বেশি হতে পারে না
+    const taxAfterRebate = Math.max(0, taxBeforeRebate - rebate);
+
+    // ---------- সর্বনিম্ন কর (৳৫,০০০ / নতুন করদাতা ৳১,০০০) ----------
+    const hasTaxableIncome = (taxable > 0 || landSeparate > 0 || shareTaxable > 0 || dividend > 0);
+    const minFloor = newTaxpayer ? MIN_TAX_NEW : MIN_TAX;
+    const minTaxApplied = (hasTaxableIncome && taxAfterRebate < minFloor) ? (minFloor - taxAfterRebate) : 0;
+    const taxAfterMin = taxAfterRebate + minTaxApplied;
+
+    // ---------- সারচার্জ (নিট পরিসম্পদের টিয়ার × আয়কর) ----------
+    let sRate = 0;
+    for (const t of WEALTH_TIERS) { if (netWealth <= t.upTo) { sRate = t.rate; break; } }
+    if (vehHouse && sRate === 0) sRate = 0.10;   // মোটরগাড়ি/নির্ধারিত গৃহসম্পত্র → ১০% টিয়ার
+    const surcharge = sRate * taxAfterMin;
+
+    // ---------- প্ররণাদনা / অতিরিক্ত কর (ধারা ১৭৩) ----------
+    const paidCredits = tds + advance;
+    const penaltyBase = Math.max(0, taxAfterMin - paidCredits);
+    let penalty = 0, penaltyNote = '';
+    switch (filingPeriod) {
+        case 'q1':   penalty = Math.min(penaltyBase * 0.05, 25000); penaltyNote = '১ জুলাই–৩০ সেপ্টেম্বর দাখিল: প্রদেয় করের ৫% বা ৳২৫,০০০ — যেটি কম (প্ররণাদনা)।'; break;
+        case 'q2':   penalty = 0; penaltyNote = '১ অক্টোবর–৩১ ডিসেম্বর দাখিল: কোনো প্ররণাদনা বা অতিরিক্ত কর নেই।'; break;
+        case 'q3':   penalty = Math.max(penaltyBase * 0.02, 3000); penaltyNote = '১ জানুয়ারি–৩১ মার্চ দাখিল: প্রদেয় করের ২% বা সর্বনিম্ন ৳৩,০০০ (অতিরিক্ত কর)।'; break;
+        case 'q4':   penalty = Math.max(penaltyBase * 0.05, 5000); penaltyNote = '১ এপ্রিল–৩০ জুন দাখিল: প্রদেয় করের ৫% বা সর্বনিম্ন ৳৫,০০০ (অতিরিক্ত কর)।'; break;
+        case 'late': penalty = Math.max(penaltyBase * 0.10, 5000); penaltyNote = '৩০ জুনের পরে স্বপ্রণোদিতভাবে বিলম্বিত দাখিল: ১০% বা সর্বনিম্ন ৳৫,০০০ (ধারা ১৭৩)।'; break;
+    }
+
+    // ---------- মোট প্রদেয় ----------
+    const totalPayable = taxAfterMin + surcharge + penalty;
+    const net = totalPayable - paidCredits;
+
+    // ---------- রেন্ডার ----------
+    set('r_totalIncome', salary + house + agri + business + capitalOther + capitalLand + capitalShares + financial + dividend + other);
+    set('r_limit', limit);
+    set('r_exempt', salaryExempt + agriExempt);
+    set('r_taxable', taxable);
+
+    document.getElementById('slabRows').innerHTML = rows.map(r =>
+        `<tr><td>${r.label}</td><td>${(r.rate*100).toFixed(0)}%</td><td>${fmt(r.amt)}</td><td>${fmt(r.tax)}</td></tr>`
+    ).join('');
+    document.getElementById('slabTotal').textContent = fmt(slabTax);
+
+    set('r_sepTax', sepTax);
+    set('r_taxBefore', taxBeforeRebate);
+    set('r_invest', investEligible);
+    set('r_rebate', rebate);
+    set('r_taxAfter', taxAfterRebate);
+    set('r_173', taxAfterMin);
+    set('r_surcharge', surcharge);
+    set('r_totalPayable', totalPayable);
+    set('r_paid', paidCredits);
+
+    document.getElementById('minTaxRow').classList.toggle('hidden', minTaxApplied <= 0);
+    set('r_minTax', minTaxApplied);
+    document.getElementById('minTaxNote').classList.toggle('hidden', minTaxApplied <= 0);
+
+    document.getElementById('penaltyRow').classList.toggle('hidden', penalty <= 0);
+    set('r_penalty', penalty);
+    const pn = document.getElementById('penaltyNote');
+    pn.classList.toggle('hidden', penalty <= 0);
+    pn.textContent = penaltyNote;
+
+    const payable = Math.max(0, net);
+    const refund = Math.max(0, -net);
+    set('r_net', payable);
+    document.getElementById('refundLine').classList.toggle('hidden', refund <= 0);
+    set('r_refund', refund);
+
+    document.getElementById('results').classList.remove('hidden');
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
